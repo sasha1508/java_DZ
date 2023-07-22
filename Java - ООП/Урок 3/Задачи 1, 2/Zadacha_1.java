@@ -3,6 +3,10 @@
 // 2)Реализовать любой выбранный интерфейс из списка (Iterator<E>, Iterable<E>, Comparator<E>, Comparable<E>) в предыдущем ДЗ, 
 // предоставив собственную реализацию.
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 public class Zadacha_1 {
     public static void main(String[] args) {
         clearScreen();
@@ -14,10 +18,25 @@ public class Zadacha_1 {
             return "Моя площадь = " + x.CalculateArea();
         };
 
+        LinkedList<Info> listInfo = new LinkedList<>();
+
         Rectangle rectangle1 = new Rectangle();
         Rectangle rectangle2 = new Rectangle(200, 300);
         Owner Sergey = new Owner("Сергей");
         Cat murzic = new Cat("Мурзик", 1, Sergey);
+
+        listInfo.add(rectangle1);
+        listInfo.add(rectangle2);
+        listInfo.add(Sergey);
+        listInfo.add(Sergey);
+
+        Iterator<Info> iterator = listInfo.iterator();
+        while (iterator.hasNext()) {
+            iterator.next().info();
+            System.out.println("");
+        }
+
+        System.out.println("");
 
         rectangle1.Zhivoy();
         rectangle1.hello();
