@@ -27,8 +27,147 @@
 // При возникновении проблемы с чтением-записью в файл, исключение должно быть корректно обработано, 
 // пользователь должен увидеть стектрейс ошибки.
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+import javax.xml.crypto.Data;
+
+
 public class Zadacha_1 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        clearScreen();
+
+        int result = inputData();
+
+        if(result == -1) {System.out.println("Вы ввели меньше данных, чем требуется");}
+        else if(result == -2) {System.out.println("Вы ввели больше данных, чем требуется");}
+    }
+
+    public static int inputData() throws IOException{
+        Gender gender = Gender.UNKNOWN;
+        long phone = 0; 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate  date = LocalDate.parse("01.01.0001", formatter);
+        String name1 = "";
+        String name2 = "";
+        String name3 = "";
+        int namberOfName = 1;
         
+        System.out.print("Введи данные (Фамилия Имя Отчество датарождения номертелефона пол): ");
+
+        BufferedReader in = new BufferedReader(System.console().reader()); //создаём буфер для чтения строки
+
+        String inputString = in.readLine();  //получаем введённую строку
+        System.out.println(inputString);
+
+        String[] inputList = inputString.split(" ");  //разделяем исходную строку на части
+
+        if(inputList.length < 6) {return -1;}  //если введено меньше данных, то возвращаем код ошибки
+        else if(inputList.length > 6) {return -2;}  //если введено больше данных, то возвращаем код ошибки
+
+        for (String iterable_element : inputList) {
+            //Получаем номер телефона:
+            try {
+                phone = Long.parseLong(iterable_element);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            
+            //Получаем дату рождения:
+            try {
+                date = LocalDate.parse(iterable_element, formatter);               
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+
+            if(iterable_element.equals("f"))  {gender = Gender.FEMALE;}
+            else if(iterable_element.equals("m"))  {gender = Gender.MALE;}
+            else if(itPhone(iterable_element)) {}
+            else if(itDate(iterable_element)) {}
+            else if(namberOfName == 1) {name1 = iterable_element; namberOfName++;}
+            else if(namberOfName == 2) {name2 = iterable_element; namberOfName++;}
+            else if(namberOfName == 3) {name3 = iterable_element; namberOfName++;}
+            
+            
+           // System.out.println(iterable_element);
+        }
+
+        //Обрабатываем исключения:
+        if(gender == Gender.UNKNOWN)  {throw new RuntimeException("Не получилось распознать пол.");}
+        else if(phone == 0)  {throw new RuntimeException("Не получилось распознать номер телефона.");}
+        else if(date.isEqual(LocalDate.parse("01.01.0001", formatter)))  {throw new RuntimeException("Не получилось распознать дату рождения.");}
+
+        System.out.println("Пол: " + GenderToString(gender));
+        System.out.println("Телефон: " + phone);
+        System.out.println("Дата рождения: " + date);
+        System.out.println("ФИО: " +  name1 + " " + name2 + " " + name3);
+
+        saveFile(name1, name2, name3, date, formatter, phone, gender);
+
+        return 0;
+    }
+
+    //Сохранение файла:
+    public static void saveFile(String name1, String name2, String name3, LocalDate date, DateTimeFormatter formatter, long phone, Gender gender) throws IOException{
+        File file = new File( "Java - исключения\\Урок 3\\Задача 1\\" + name1 + ".txt");
+        //create the file.
+        if (file.createNewFile()){
+        System.out.println("Файл создан!");
+        }
+        else{
+        System.out.println("Файл уже существует.");
+        }
+        //write content
+        FileWriter writer = new FileWriter (file);
+        String formattedDate = date.format(formatter);
+
+        String stringToSave = "<" + name1 + "><" + name2 + "><" + name3 + "><" + formattedDate + "> <" + phone + "><" + GenderToString(gender) + ">";
+        writer.write(stringToSave); //<Фамилия><Имя><Отчество><датарождения> <номертелефона><пол>
+        writer.close();
+    }
+
+    // Очистка консоли:
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public enum Gender{
+        MALE,
+        FEMALE,
+        UNKNOWN
+    }
+
+    public static String GenderToString(Gender gender){
+        if(gender == Gender.MALE) {return "мужской";}
+        if(gender == Gender.FEMALE) {return "женский";}
+        return "не определён";
+    }
+
+    public static boolean itPhone(String iterable_element){
+        //Получаем номер телефона:
+        try {
+            long phone = Long.parseLong(iterable_element);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean itDate(String iterable_element){
+        //Получаем дату рождения:
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate date = LocalDate.parse(iterable_element, formatter);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
