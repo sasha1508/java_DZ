@@ -28,15 +28,22 @@
 // пользователь должен увидеть стектрейс ошибки.
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 import javax.xml.crypto.Data;
+
 
 
 public class Zadacha_1 {
@@ -115,21 +122,45 @@ public class Zadacha_1 {
 
     //Сохранение файла:
     public static void saveFile(String name1, String name2, String name3, LocalDate date, DateTimeFormatter formatter, long phone, Gender gender) throws IOException{
+        String stringToSave = "";
+        
         File file = new File( "Java - исключения\\Урок 3\\Задача 1\\" + name1 + ".txt");
         //create the file.
         if (file.createNewFile()){
-        System.out.println("Файл создан!");
+            System.out.println("Файл создан!");
+            String formattedDate = date.format(formatter);
+            stringToSave = "<" + name1 + "><" + name2 + "><" + name3 + "><" + formattedDate + "> <" + phone + "><" + GenderToString(gender) + ">";
+
+            //write content
+            FileWriter writer = new FileWriter (file);
+            writer.write(stringToSave); //<Фамилия><Имя><Отчество><датарождения> <номертелефона><пол>
+            writer.close();
         }
         else{
-        System.out.println("Файл уже существует.");
-        }
-        //write content
-        FileWriter writer = new FileWriter (file);
-        String formattedDate = date.format(formatter);
+            System.out.println("Файл уже существует.");
+            
+            String content = readFile("Java - исключения\\Урок 3\\Задача 1\\" + name1 + ".txt");
+            System.out.println("TEST - " + content);
 
-        String stringToSave = "<" + name1 + "><" + name2 + "><" + name3 + "><" + formattedDate + "> <" + phone + "><" + GenderToString(gender) + ">";
-        writer.write(stringToSave); //<Фамилия><Имя><Отчество><датарождения> <номертелефона><пол>
-        writer.close();
+            String formattedDate = date.format(formatter);
+            stringToSave = "<" + name1 + "><" + name2 + "><" + name3 + "><" + formattedDate + "> <" + phone + "><" + GenderToString(gender) + ">";
+
+            if(!content.equals(stringToSave)){
+                stringToSave = content + "\n" + stringToSave;
+
+                //write content
+                FileWriter writer = new FileWriter (file);
+                writer.write(stringToSave); //<Фамилия><Имя><Отчество><датарождения> <номертелефона><пол>
+                writer.close();
+            }
+        }
+        
+        
+    }
+
+    public static String readFile(String path) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded);
     }
 
     // Очистка консоли:
